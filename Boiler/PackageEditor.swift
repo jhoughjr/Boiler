@@ -27,14 +27,11 @@ public class PackageEditor {
         
         if let handle = FileHandle.init(forUpdatingAtPath: path) {
             for try await line in handle.bytes.lines {
-                print(line)
                 lines.append(line)
             }
             try handle.close()
             
-        }else {
-            
-            print("\(EditorError.fileNotFound) @ \(path)")
+        }else {            
             throw EditorError.fileNotFound
         }
     }
