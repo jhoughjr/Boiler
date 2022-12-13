@@ -8,12 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		D871895A294836AD008DC640 /* BoilerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8718959294836AD008DC640 /* BoilerApp.swift */; };
-		D871895C294836AD008DC640 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D871895B294836AD008DC640 /* ContentView.swift */; };
 		D871895E294836AE008DC640 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D871895D294836AE008DC640 /* Assets.xcassets */; };
 		D8718961294836AE008DC640 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D8718960294836AE008DC640 /* Preview Assets.xcassets */; };
-		D871896C294836AE008DC640 /* BoilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D871896B294836AE008DC640 /* BoilerTests.swift */; };
 		D8718976294836AE008DC640 /* BoilerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8718975294836AE008DC640 /* BoilerUITests.swift */; };
 		D8718978294836AE008DC640 /* BoilerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8718977294836AE008DC640 /* BoilerUITestsLaunchTests.swift */; };
+		D8718986294836C1008DC640 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8718984294836C1008DC640 /* ContentView.swift */; };
+		D8718987294836C1008DC640 /* PackageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8718985294836C1008DC640 /* PackageEditor.swift */; };
+		D87189892948377A008DC640 /* PackageEditorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87189882948377A008DC640 /* PackageEditorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,15 +37,16 @@
 /* Begin PBXFileReference section */
 		D8718956294836AD008DC640 /* Boiler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Boiler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8718959294836AD008DC640 /* BoilerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoilerApp.swift; sourceTree = "<group>"; };
-		D871895B294836AD008DC640 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D871895D294836AE008DC640 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D8718960294836AE008DC640 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D8718962294836AE008DC640 /* Boiler.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Boiler.entitlements; sourceTree = "<group>"; };
 		D8718967294836AE008DC640 /* BoilerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoilerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D871896B294836AE008DC640 /* BoilerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoilerTests.swift; sourceTree = "<group>"; };
 		D8718971294836AE008DC640 /* BoilerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoilerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8718975294836AE008DC640 /* BoilerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoilerUITests.swift; sourceTree = "<group>"; };
 		D8718977294836AE008DC640 /* BoilerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoilerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		D8718984294836C1008DC640 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = "../../../../Desktop/untitled folder 2/ContentView.swift"; sourceTree = "<group>"; };
+		D8718985294836C1008DC640 /* PackageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PackageEditor.swift; sourceTree = "<group>"; };
+		D87189882948377A008DC640 /* PackageEditorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageEditorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,8 +97,9 @@
 		D8718958294836AD008DC640 /* Boiler */ = {
 			isa = PBXGroup;
 			children = (
+				D8718984294836C1008DC640 /* ContentView.swift */,
+				D8718985294836C1008DC640 /* PackageEditor.swift */,
 				D8718959294836AD008DC640 /* BoilerApp.swift */,
-				D871895B294836AD008DC640 /* ContentView.swift */,
 				D871895D294836AE008DC640 /* Assets.xcassets */,
 				D8718962294836AE008DC640 /* Boiler.entitlements */,
 				D871895F294836AE008DC640 /* Preview Content */,
@@ -115,7 +118,7 @@
 		D871896A294836AE008DC640 /* BoilerTests */ = {
 			isa = PBXGroup;
 			children = (
-				D871896B294836AE008DC640 /* BoilerTests.swift */,
+				D87189882948377A008DC640 /* PackageEditorTests.swift */,
 			);
 			path = BoilerTests;
 			sourceTree = "<group>";
@@ -259,8 +262,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D871895C294836AD008DC640 /* ContentView.swift in Sources */,
+				D8718987294836C1008DC640 /* PackageEditor.swift in Sources */,
 				D871895A294836AD008DC640 /* BoilerApp.swift in Sources */,
+				D8718986294836C1008DC640 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,7 +272,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D871896C294836AE008DC640 /* BoilerTests.swift in Sources */,
+				D87189892948377A008DC640 /* PackageEditorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
