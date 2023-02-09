@@ -18,19 +18,24 @@ public class PackageEditor {
     var path:String = ""
     
     // Where editing happens.
-    private var lines = [String]()
+    internal var lines = [String]()
+    internal var rawFileData = Data() {
+        didSet {
+            lines = string.split(separator: "\n", omittingEmptySubsequences: false)
+                          .map({String($0)})
+        }
+    }
+    
+    internal var string:String {
+        String(data: rawFileData, encoding: .utf8) ?? ""
+    }
     
     /// Loads a Package.swift file @ path property of the receiver into the lines property of the receiver.
     func load() async throws {
-
-        lines = [String]()
         
         if let handle = FileHandle.init(forUpdatingAtPath: path) {
-            for try await line in handle.bytes.lines {
-                lines.append(line)
-            }
+            rawFileData = (try? handle.readToEnd()) ?? Data()
             try handle.close()
-            
         }else {            
             throw EditorError.fileNotFound
         }
