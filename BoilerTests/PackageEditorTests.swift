@@ -88,19 +88,25 @@ final class PackageEditorTests: XCTestCase {
         deleteTestPackageSwift()
     }
     
+    /// Initialization Tests
     func test_path_is_empty_on_init() throws {
         XCTAssertTrue(subject.path.isEmpty, "path should be empty on init.")
     }
     
     func test_rawFileData_is_empty_on_init() throws {
-        XCTAssertTrue(subject.rawFileData.count == 0, "rawFileData should be empty on init.")
+        XCTAssertTrue(subject.rawDataBuffer.count == 0, "rawFileData should be empty on init.")
     }
     
     func test_lines_are_empty_on_init() throws {
         XCTAssertTrue(subject.lines.isEmpty, "lines should be empty on init.")
     }
+    
     func test_string_is_empty_on_init() throws {
-        XCTAssertTrue(subject.string.isEmpty, "string should be empty on init.")
+        guard let s = try? subject.stringFromRawDataBuffer() else {
+            XCTFail("couldnt get string from subject!?")
+            return
+        }
+        XCTAssertTrue(s.isEmpty, "string should be empty on init.")
     }
     
     func test_last_package_line_returns_not_found_flag_int_on_init() throws {
@@ -113,6 +119,24 @@ final class PackageEditorTests: XCTestCase {
         XCTAssertTrue(result == -1, "Should be nothing to find on init.")
     }
     
+    /// Load Tests
+    
+    /// pre-req
+    func test_strings_are_equal() async throws {
+        XCTAssertEqual(testPackage, testPackage)
+    }
+    
+    func test_join_and_split_are_symmetrical() async throws {
+      
+        let split = testPackage.split(separator: "\n",
+                                      omittingEmptySubsequences: false)
+        let join = split.joined(separator: "\n")
+        
+        // Assert
+        XCTAssertEqual(testPackage, join, "a join should perfectly undo a split.")
+    }
+    
+    // Path check tests
     func test_load_throws_error_with_notfound_path() async throws {
         var result:PackageEditor.EditorError?
         do {
@@ -140,6 +164,7 @@ final class PackageEditorTests: XCTestCase {
         XCTAssertNil(result, "An error should not have thrown")
     }
     
+    /// load verification
     func test_lines_are_not_empty_after_load() async throws {
         var result:Error?
         do {
@@ -156,20 +181,6 @@ final class PackageEditorTests: XCTestCase {
         
         XCTAssertNil(result, "An error should not have thrown")
         
-    }
-    
-    func test_strings_are_equal() async throws {
-        XCTAssertEqual(testPackage, testPackage)
-    }
-    
-    func test_join_and_split_are_symmetrical() async throws {
-      
-        let split = testPackage.split(separator: "\n",
-                                      omittingEmptySubsequences: false)
-        let join = split.joined(separator: "\n")
-        
-        // Assert
-        XCTAssertEqual(testPackage, join, "a join should perfectly undo a split.")
     }
     
     func test_lines_count_equals_loaded_lines_count() async throws {
@@ -208,5 +219,57 @@ final class PackageEditorTests: XCTestCase {
         }
         
         XCTAssertNil(result, "An error should not have thrown")
+    }
+    
+    /// Save tests
+    ///
+    func test_save_throws_if_empty_path() async {
+        Task {
+            // setup
+            subject.path = ""
+            
+            do {
+                try await subject.save()
+            }
+            catch(let error) {
+                let result = error as? PackageEditor.EditorError
+                
+                XCTAssertTrue(error is PackageEditor.EditorError, "Expected PackageEditor.EditorError")
+                print(error)
+                XCTAssertTrue(result == .savePathEmpty, "Expected PackageEditor.savePathEmpty")
+            }
+        }
+
+    }
+    
+    func test_save_throws_if_no_outputData() async {
+            // this can only really fail if a string
+            // cant be gotten from the rawDataBuffer
+        
+            // setup
+            subject.path = testFileURL().absoluteURL.path()
+            let invalids = [0xC0, 0xC1, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF]
+            let invalidData = Data(bytes: invalids,
+                                   count: invalids.count)
+            
+            subject.rawDataBuffer = invalidData
+            
+            do {
+                try await subject.save()
+            }
+            catch(let error) {
+                let result = error as? PackageEditor.EditorError
+                
+                XCTAssertTrue(error is PackageEditor.EditorError, "Expected PackageEditor.EditorError")
+                XCTAssertTrue(result == .noOutputData, "Expected PackageEditor.notOutputData")
+            }
+    }
+    
+    func test_save_does_NOT_throw_if_outputData() async {
+
+        subject.path = testFileURL().absoluteURL.path()
+        XCTAssertNoThrow({
+            try await self.subject.save()
+        })
     }
 }
