@@ -6,8 +6,67 @@
 //
 
 import Foundation
+import Combine
+import SwiftUI
 
-public class PackageEditor {
+public class PackageInfoStore:ObservableObject {
+    
+    @AppStorage("packagesPath")
+    var packagesPath = ""
+    
+    static let shared = PackageInfoStore()
+    
+    struct PackageInfoRecord:Codable, Identifiable, Equatable, Hashable {
+        static func == (lhs: PackageInfoStore.PackageInfoRecord, rhs: PackageInfoStore.PackageInfoRecord) -> Bool {
+            lhs.id == rhs.id
+        }
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id.hashValue)
+        }
+        
+        var id = UUID()
+        var name:String
+        var info:PackageEditor.PackageInfo
+        var url:URL?
+    }
+    
+    @Published
+    var packages = [PackageInfoRecord]()
+    
+    func save() {
+        if let u = URL(string: packagesPath),
+           let d = try? JSONEncoder().encode(packages) {
+            do {
+                let url = u.appending(component: "packages.json")
+                print("saving \(url)")
+                try d.write(to:url)
+            }
+            catch {
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
+    func load() {
+        if let u = URL(string: packagesPath),
+           let d = try? Data(contentsOf: u.appending(component: "packages.json")),
+           let j = try? JSONDecoder().decode([PackageInfoRecord].self,
+                                             from: d) {
+            print("loaded packages")
+            print(j)
+            packages = j
+        }
+    }
+}
+
+public class PackageEditor:ObservableObject {
+    
+    public var toolsVersion = "5.6"
+    public struct PackageInfo:Codable {
+        let package:String
+        let product:String
+    }
 
     let templatePackageString =
     """
@@ -50,6 +109,7 @@ public class PackageEditor {
         ]
     )
     """
+    
     enum EditorError:Error {
         case fileNotFound
         case savePathEmpty
@@ -59,9 +119,11 @@ public class PackageEditor {
     }
     
     /// The path of the Package.swift file to load or save from.
+    @Published
     var path:String = ""
     
     // Where editing happens.
+    @Published
     internal var lines = [String]()
     
     internal var rawDataBuffer = Data() {
@@ -73,14 +135,14 @@ public class PackageEditor {
     internal func setLinesFromData() {
         if let s = try? stringFromRawDataBuffer().split(separator: "\n", omittingEmptySubsequences: false)
             .map({String($0)}) {
-            lines = s
+                self.lines = s
         }else {
-            lines = [String]()
+            self.lines = [String]()
         }
     }
     
     // prepare to write edits done per line
-    func setRawDataBufferFromLines() {
+    internal func setRawDataBufferFromLines() {
         if let ls = String(lines.joined(separator: "\n")).data(using: .utf8) {
             rawDataBuffer = ls
         }else {
@@ -101,7 +163,7 @@ public class PackageEditor {
     }
     
     /// Loads a Package.swift file @ path property of the receiver into the  lines property of the receiver.
-    func load() async throws {
+    public func load() async throws {
         
         if let handle = FileHandle.init(forUpdatingAtPath: path) {
             rawDataBuffer = (try? handle.readToEnd()) ?? Data()
@@ -112,7 +174,7 @@ public class PackageEditor {
     }
     
     /// Writes the lines property of the receiver to the path of the receiver as utf8 data
-    func save() async throws {
+    public func save() async throws {
         guard !path.isEmpty else {
             throw EditorError.savePathEmpty
         }
@@ -129,7 +191,7 @@ public class PackageEditor {
     
     /// Adds the package represented by the package info the lines property of the receiver.
     ///
-    func add(_ info:PackageInfo) {
+    public func add(_ info:PackageInfo) {
         // insert info.package in deps
         // insert info.product into targets
         
@@ -145,32 +207,56 @@ public class PackageEditor {
         // remove info.product into targets
     }
     
-    
-    /// Returns the line number of the last package line
-    /// Returns -1 if no product line number is found
-    internal func lastPackageLineNumber() -> Int {
+    /// Returns the line numbers of  package lines
+    internal func packageLineNumbers() -> [Int] {
        
-        var packageLines = [Int]()
+        var packageLines = [(Int, String)]()
         
         for (i,l) in lines.enumerated() {
-            if l.hasPrefix(".package(") {
-                packageLines.append(i)
+            if !l.hasPrefix("//") {
+                if l.contains(".package(url:") {
+                    packageLines.append((i + 1,l))
+                }
             }
         }
-        return packageLines.last ?? -1
+        return packageLines.map {$0.0}
     }
     
-    /// Returns the line number of the last product line
-    /// Returns -1 if no prduct line number is found
-    internal func lastProductLineNumber() -> Int {
+    public func lastPackageLineNumber() -> Int {
+        packageLineNumbers().last ?? -1
+    }
+    
+    /// Returns the line numbers of product lines
+    public func productLineNumbers() -> [Int] {
         
-        var productLines = [Int]()
+        var productLines = [(Int, String)]()
 
         for (i,l) in lines.enumerated() {
-            if l.hasPrefix(".product(") {
-                productLines.append(i)
+            if l.contains(".product(") {
+                productLines.append((i + 1,l))
             }
         }
-        return productLines.last ?? -1
+        return productLines.map({$0.0})
     }
+    
+    public func lastProductLineNumber() -> Int {
+        productLineNumbers().last ?? -1
+    }
+    
+    internal func packageFrom(lineNumber:Int) -> String {
+        let line = lines[lineNumber]
+        guard !line.isEmpty else {
+            return ""
+        }
+        return line
+    }
+    
+    internal func productFrom(lineNumber:Int) -> String {
+        let line = lines[lineNumber]
+        guard !line.isEmpty else {
+            return ""
+        }
+        return line
+    }
+    
 }
